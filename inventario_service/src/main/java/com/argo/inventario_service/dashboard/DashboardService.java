@@ -115,7 +115,7 @@ public class DashboardService {
             listaSalidasSemanales.add(salidasSemanales);
 
 
-            lunesDate = lunesDate.withDayOfMonth(lunesDate.getDayOfMonth() + 1);
+            lunesDate = lunesDate.plusDays(1);
 
 
         }

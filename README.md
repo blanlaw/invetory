@@ -1,0 +1,2 @@
+# inventory alokate
+inventario web
