@@ -74,67 +74,47 @@ public class ProductoService {
      * @param codigo    the codigo
      * @return the list
      */
-    public List buscarPorNombre(int idalmacen, String codigo) {
+    public List<CodigoList> buscarPorNombre(int idalmacen, String codigo) {
+        if (codigo == null || codigo.trim().isEmpty()) {
+            return Collections.emptyList();
+        }
 
-        Almacen almacen = this.iAlmacen.findById(idalmacen).get();
+        Optional<Almacen> optionalAlmacen = this.iAlmacen.findById(idalmacen);
+        if (!optionalAlmacen.isPresent()) {
+            throw new RuntimeException("Almacén no encontrado con ID: " + idalmacen);
+        }
 
+        Almacen almacen = optionalAlmacen.get();
 
-        return this.iCodigoProducto.buscarPorNombre().stream().filter(productoAlmacen -> {
+        return this.iCodigoProducto.buscarPorNombre().stream()
+                .filter(productoAlmacen -> {
+                    if (productoAlmacen == null) return false;
+                    if (productoAlmacen.getId() == null) return false;
+                    if (productoAlmacen.getId().getCodigo() == null) return false;
+                    if (productoAlmacen.getId().getCodigo().getDescripcion() == null) return false;
+                    if (productoAlmacen.getId().getIdAlmacen() == null) return false;
 
-            String descripcion = productoAlmacen.getId().getCodigo().getDescripcion().toUpperCase();
-            return productoAlmacen.getId().getIdAlmacen() == almacen && descripcion.contains(codigo.toUpperCase());
-
-
-        }).map(productoAlmacen -> {
-
-            CodigoProducto codigo1 = productoAlmacen.getId().getCodigo();
-            return new CodigoList() {
-                @Override
-                public String getCodigo() {
-                    return codigo1.getCodigo();
-                }
-
-                @Override
-                public String getDescripcion() {
-                    return codigo1.getDescripcion();
-                }
-
-                @Override
-                public String getModelo() {
-                    return codigo1.getModelo();
-                }
-
-                @Override
-                public String getMarca() {
-                    return codigo1.getMarca();
-                }
-
-                @Override
-                public String getColor() {
-                    return codigo1.getColor();
-                }
-
-                @Override
-                public String getTalla() {
-                    return codigo1.getTalla();
-                }
-
-                @Override
-                public String getTipo() {
-                    return codigo1.getTipo().getTipo();
-                }
-
-                @Override
-                public int getCantidad() {
-                    return productoAlmacen.getStock();
-                }
-            };
-
-
-        }).collect(Collectors.toList());
-
-
+                    String descripcion = productoAlmacen.getId().getCodigo().getDescripcion().toUpperCase();
+                    return productoAlmacen.getId().getIdAlmacen().equals(almacen)
+                            && descripcion.contains(codigo.toUpperCase());
+                })
+                .map(productoAlmacen -> {
+                    final CodigoProducto codigo1 = productoAlmacen.getId().getCodigo();
+                    final int stock = productoAlmacen.getStock();
+                    return new CodigoList() {
+                        @Override public String getCodigo() { return codigo1.getCodigo(); }
+                        @Override public String getDescripcion() { return codigo1.getDescripcion(); }
+                        @Override public String getModelo() { return codigo1.getModelo(); }
+                        @Override public String getMarca() { return codigo1.getMarca(); }
+                        @Override public String getColor() { return codigo1.getColor(); }
+                        @Override public String getTalla() { return codigo1.getTalla(); }
+                        @Override public String getTipo() { return codigo1.getTipo().getTipo(); }
+                        @Override public int getCantidad() { return stock; }
+                    };
+                })
+                .collect(Collectors.toList());
     }
+
 
     /**
      * Todos list.
