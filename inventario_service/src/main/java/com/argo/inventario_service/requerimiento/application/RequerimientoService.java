@@ -425,11 +425,9 @@ public class RequerimientoService {
 
         Requerimiento requerimiento = this.iRequerimiento.findById(codigo).orElseThrow(RuntimeException::new);
 
-
         User requeridoPor = requerimiento.getRequeridoPor();
 
         return this.iAccess.findBySub(requeridoPor.getIdUser());
-
 
     }
 
