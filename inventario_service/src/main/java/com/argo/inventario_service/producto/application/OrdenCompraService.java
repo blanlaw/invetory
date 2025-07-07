@@ -142,11 +142,12 @@ public class OrdenCompraService {
 
                 } else {
 
-                    String codigo = det.getDescripcion() + tipo.substring(0, 4) + "-" + 0;
+                    //String codigo = det.getDescripcion() + tipo.substring(0, 4) + "-" + 0;
 
 
                     List<String> strings = this.iCodigoProducto.todoLista(det.getDescripcion());
-
+                    String tipoCorto = tipo.length() >= 4 ? tipo.substring(0, 4) : tipo;
+                    String codigo = det.getDescripcion() + tipoCorto + "-" + 0;
 
                     if (strings.size() != 0) {
 
